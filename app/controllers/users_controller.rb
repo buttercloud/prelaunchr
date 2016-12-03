@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_filter :skip_first_page, only: :new
+  before_filter :forward_existing_users, only: :create
   before_filter :handle_ip, only: :create
 
   def new
@@ -60,6 +61,13 @@ class UsersController < ApplicationController
       redirect_to '/refer-a-friend'
     else
       cookies.delete :h_email
+    end
+  end
+
+  def forward_existing_users
+    if User.find_by(email: params[:user][:email]).present?
+      cookies[:h_email] = params[:user][:email]
+      redirect_to '/refer-a-friend' 
     end
   end
 
