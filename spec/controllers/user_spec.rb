@@ -30,6 +30,14 @@ describe UsersController, type: :controller do
       expect(response).to redirect_to '/refer-a-friend'
     end
 
+    it 'skips to the referral page is the user\s email already exists' do
+      em = generate_email
+      existing_user = User.create!(email: em)
+
+      expect { post(:create, user: { email: em }) }.to_not change { User.count }
+      expect(response).to redirect_to '/refer-a-friend'
+    end
+
     it 'assigns referral code to cookie if code belongs to user' do
       expect(User).to receive(:find_by_referral_code).with(@referral_code) do
         User.new
